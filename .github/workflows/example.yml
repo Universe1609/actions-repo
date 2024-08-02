@@ -1,0 +1,36 @@
+name: Dispatch with Multiple Users
+
+on:
+  workflow_dispatch:
+    inputs:
+      users:
+        description: 'List of users or emails (comma-separated)'
+        required: true
+        default: 'user1@example.com,user2@example.com'
+
+jobs:
+  process-users:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Parse users input
+      id: parse_users
+      run: |
+        users="${{ github.event.inputs.users }}"
+        IFS=',' read -r -a user_array <<< "$users"
+        for user in "${user_array[@]}"; do
+          echo "User: $user"
+          echo "::set-output name=user_${user}::${user}"
+        done
+
+    - name: Display users
+      run: |
+        users="${{ github.event.inputs.users }}"
+        IFS=',' read -r -a user_array <<< "$users"
+        for user in "${user_array[@]}"; do
+          echo "User: $user"
+        done
+
